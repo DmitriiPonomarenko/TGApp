@@ -14,6 +14,7 @@ export function ProfilePage() {
         </p>
       </header>
 
+      <div className="page-content">
       <Card className="mb-4">
         <CardHeader>
           <CardTitle>Пользователь</CardTitle>
@@ -31,6 +32,7 @@ export function ProfilePage() {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   )
 }

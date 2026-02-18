@@ -44,6 +44,11 @@
   min-height: auto;
 }
 
+/* Контент под липким заголовком: отступ, чтобы не заходил под header */
+.page-content {
+  margin-top: var(--app-header-top);
+}
+
 /* В Mini App не закрывать приложение при скролле вниз (overscroll) */
 @supports (overflow: overlay) {
   .overscroll-contain {

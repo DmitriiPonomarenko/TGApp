@@ -44,6 +44,7 @@ export function NotesPage() {
         </p>
       </header>
 
+      <div className="page-content">
       <div className="mb-4 flex justify-end">
         <Button size="sm" onClick={openCreate} className="gap-1.5">
           <Plus className="h-4 w-4" />
@@ -70,6 +71,7 @@ export function NotesPage() {
           </AnimatePresence>
         </ul>
       )}
+      </div>
 
       <NoteForm
         open={formOpen}

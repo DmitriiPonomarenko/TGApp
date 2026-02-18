@@ -37,9 +37,9 @@ export function FinancePage() {
       <header className="page-header mb-2">
         <h1 className="text-xl font-semibold text-tg-text">Финансы</h1>
       </header>
-      <p className="text-sm text-tg-hint mb-4">{monthLabel}</p>
-
-      <div className="mb-6 space-y-3">
+      <div className="page-content">
+        <p className="text-sm text-tg-hint mb-4">{monthLabel}</p>
+        <div className="mb-6 space-y-3">
         <Card>
           <CardHeader>
             <CardTitle>Баланс</CardTitle>
@@ -110,6 +110,7 @@ export function FinancePage() {
           </AnimatePresence>
         </ul>
       )}
+      </div>
 
       <TransactionForm open={formOpen} onOpenChange={setFormOpen} />
     </div>
