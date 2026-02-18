@@ -22,7 +22,7 @@ export function useNotesActions(telegramUserId: number | undefined) {
           addFromServer(created)
           return created
         }
-        return null
+        return addLocal(n) // при ошибке API сохраняем локально
       }
       return addLocal(n)
     },
@@ -36,7 +36,7 @@ export function useNotesActions(telegramUserId: number | undefined) {
     ) => {
       if (isSupabaseConfigured() && telegramUserId != null) {
         const ok = await notesApi.updateNote(telegramUserId, id, patch)
-        if (ok) updateLocal(id, patch)
+        updateLocal(id, patch) // обновляем UI в любом случае; при ошибке API хотя бы локально
       } else {
         updateLocal(id, patch)
       }
@@ -48,7 +48,7 @@ export function useNotesActions(telegramUserId: number | undefined) {
     async (id: string) => {
       if (isSupabaseConfigured() && telegramUserId != null) {
         const ok = await notesApi.removeNote(telegramUserId, id)
-        if (ok) removeLocal(id)
+        removeLocal(id) // при ошибке API всё равно убираем из списка
       } else {
         removeLocal(id)
       }

@@ -18,7 +18,12 @@ export function useFinanceActions(telegramUserId: number | undefined) {
     async (t: Omit<Transaction, 'id' | 'createdAt'>) => {
       if (isSupabaseConfigured() && telegramUserId != null) {
         const created = await financeApi.addTransaction(telegramUserId, t)
-        if (created) addFromServer(created)
+        if (created) {
+          addFromServer(created)
+        } else {
+          // Supabase недоступен или ошибка — сохраняем локально, чтобы данные не терялись
+          addLocal(t)
+        }
       } else {
         addLocal(t)
       }
@@ -31,6 +36,7 @@ export function useFinanceActions(telegramUserId: number | undefined) {
       if (isSupabaseConfigured() && telegramUserId != null) {
         const ok = await financeApi.removeTransaction(telegramUserId, id)
         if (ok) removeLocal(id)
+        else removeLocal(id) // при ошибке API всё равно убираем из списка локально
       } else {
         removeLocal(id)
       }
