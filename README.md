@@ -79,15 +79,20 @@ npm run build
 ### Vercel
 
 1. Залить код в GitHub и зайти на [vercel.com](https://vercel.com).
-2. **Add New** → **Project** → импорт репозитория.
+2. **Add New** → **Project** → импорт репозитория (например `DmitriiPonomarenko/TGApp`).
 3. Оставить настройки по умолчанию (Vite подхватывается автоматически, в проекте есть `vercel.json`).
-4. **Deploy**. После деплоя будет URL вида `https://твой-проект.vercel.app`.
+4. **Перед первым Deploy** — открой **Environment Variables**. Добавь две переменные (значения из своего `.env`):
+   - `VITE_SUPABASE_URL` = `https://atuerhjlosyzblsgtipu.supabase.co`
+   - `VITE_SUPABASE_ANON_KEY` = твой anon-ключ
+   Сохрани.
+5. Нажми **Deploy**. После деплоя будет URL вида `https://твой-проект.vercel.app` — его укажешь в BotFather как URL Mini App.
 
 ### Netlify
 
 1. Репозиторий на GitHub → [app.netlify.com](https://app.netlify.com) → **Add new site** → **Import an existing project**.
 2. Выбрать репозиторий. В настройках сборки указано в `netlify.toml`: команда `npm run build`, папка публикации `dist`.
-3. **Deploy**. URL: `https://имя-сайта.netlify.app`.
+3. **Перед Deploy** — **Site settings** → **Environment variables** → **Add variable** (или **Add from .env**): добавь `VITE_SUPABASE_URL` и `VITE_SUPABASE_ANON_KEY`.
+4. **Deploy**. URL: `https://имя-сайта.netlify.app`.
 
 ### Подключение к Telegram
 
@@ -101,8 +106,28 @@ npm run build
 
 ---
 
-## Подключение Supabase (позже)
+## Supabase
 
-- В `src` завести слой `api/` или `services/` с функциями для транзакций и заметок
-- Store (Zustand) переключить с LocalStorage на вызовы API
-- Ключи и URL — в `.env`, не коммитить
+Приложение поддерживает хранение данных в Supabase. Если переменные не заданы — используется только LocalStorage.
+
+### Настройка
+
+1. Создай проект на [supabase.com](https://supabase.com).
+2. В **SQL Editor** выполни скрипт из `supabase/schema.sql` (создаст таблицы `transactions` и `notes`).
+3. **Скопировать URL и ключ в `.env`:**
+   - Зайди в [app.supabase.com](https://app.supabase.com) и открой свой проект.
+   - В левом меню нажми **Project Settings** (иконка шестерёнки внизу).
+   - Открой вкладку **API**.
+   - Там будут:
+     - **Project URL** — длинная ссылка вида `https://abcdefghijk.supabase.co`.
+     - **Project API keys** — блок с ключами. Нужен ключ **anon** (public), не secret. Нажми **Reveal** и скопируй значение (длинная строка вроде `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...`).
+   - В корне проекта (рядом с `package.json`) создай файл **`.env`** (именно с точкой в начале).
+   - Вставь в него две строки, подставив свои значения (без кавычек):
+     ```
+     VITE_SUPABASE_URL=https://твой-проект.supabase.co
+     VITE_SUPABASE_ANON_KEY=вставь_сюда_скопированный_anon_ключ
+     ```
+   - Сохрани файл. Файл `.env` в репозиторий не коммить (он уже в `.gitignore`).
+4. Перезапусти dev-сервер: останови (`Ctrl+C`) и снова выполни `npm run dev`.
+
+Данные привязаны к `telegram_user_id` (из `WebApp.initDataUnsafe.user.id`). В Telegram при открытии Mini App подставляется пользователь, и его транзакции/заметки подтягиваются из Supabase. Без Supabase всё по-прежнему хранится в LocalStorage.

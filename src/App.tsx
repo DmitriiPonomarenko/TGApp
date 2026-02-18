@@ -1,10 +1,12 @@
-import { useTelegram } from '@/hooks/useTelegram'
+import { useTelegram, useSupabaseSync } from '@/hooks'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Layout } from '@/components/Layout'
 import { FinancePage, NotesPage, ProfilePage } from '@/pages'
 
 function App() {
-  useTelegram()
+  const { webApp } = useTelegram()
+  const telegramUserId = webApp.initDataUnsafe?.user?.id
+  useSupabaseSync(telegramUserId)
 
   return (
     <Routes>

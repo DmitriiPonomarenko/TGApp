@@ -11,6 +11,8 @@ function generateId(): string {
 export interface NotesState {
   notes: Note[]
   addNote: (n: Omit<Note, 'id' | 'createdAt' | 'updatedAt'>) => Note
+  addNoteFromServer: (note: Note) => void
+  setNotes: (notes: Note[]) => void
   updateNote: (id: string, patch: Partial<Pick<Note, 'title' | 'content' | 'reminderAt'>>) => void
   removeNote: (id: string) => void
   getNoteById: (id: string) => Note | undefined
@@ -35,6 +37,16 @@ export const useNotesStore = create<NotesState>()(
           notes: [newNote, ...state.notes],
         }))
         return newNote
+      },
+
+      addNoteFromServer: (note) => {
+        set((state) => ({
+          notes: [note, ...state.notes],
+        }))
+      },
+
+      setNotes: (notes) => {
+        set({ notes })
       },
 
       updateNote: (id, patch) => {

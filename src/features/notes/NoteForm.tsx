@@ -4,9 +4,8 @@ import { X } from 'lucide-react'
 import type { Note } from './types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { useNotesStore } from '@/store/notesStore'
 import { scheduleReminder, cancelReminder } from './api/reminders'
-import { useTelegram } from '@/hooks'
+import { useTelegram, useNotesActions } from '@/hooks'
 
 type Props = {
   open: boolean
@@ -15,9 +14,9 @@ type Props = {
 }
 
 export function NoteForm({ open, onOpenChange, editNote }: Props) {
-  const { haptic } = useTelegram()
-  const addNote = useNotesStore((s) => s.addNote)
-  const updateNote = useNotesStore((s) => s.updateNote)
+  const { haptic, webApp } = useTelegram()
+  const telegramUserId = webApp.initDataUnsafe?.user?.id
+  const { addNote, updateNote } = useNotesActions(telegramUserId)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [reminderAt, setReminderAt] = useState('')
@@ -57,7 +56,7 @@ export function NoteForm({ open, onOpenChange, editNote }: Props) {
         ? new Date(reminderAt).toISOString()
         : undefined
 
-      updateNote(editNote.id, {
+      await updateNote(editNote.id, {
         title: trimmedTitle,
         content: trimmedContent,
         reminderAt: newReminderAt,
@@ -77,12 +76,12 @@ export function NoteForm({ open, onOpenChange, editNote }: Props) {
       const reminderAtIso = reminderAt
         ? new Date(reminderAt).toISOString()
         : undefined
-      const newNote = addNote({
+      const newNote = await addNote({
         title: trimmedTitle,
         content: trimmedContent,
         reminderAt: reminderAtIso,
       })
-      if (reminderAtIso) {
+      if (newNote && reminderAtIso) {
         await scheduleReminder(newNote.id, reminderAtIso, {
           title: trimmedTitle,
           content: trimmedContent,

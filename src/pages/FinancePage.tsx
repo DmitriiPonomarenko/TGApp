@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
+import { useTelegram, useFinanceActions } from '@/hooks'
 import { useFinanceStore } from '@/store/financeStore'
 import { formatCurrency } from '@/utils'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/Card'
@@ -14,6 +15,8 @@ const currentMonth = now.getMonth()
 
 export function FinancePage() {
   const [formOpen, setFormOpen] = useState(false)
+  const telegramUserId = useTelegram().webApp.initDataUnsafe?.user?.id
+  const { removeTransaction } = useFinanceActions(telegramUserId)
   const transactions = useFinanceStore((s) => s.transactions)
   const balance = useFinanceStore((s) => s.getBalance())
   const monthlyIncome = useFinanceStore((s) =>
@@ -22,7 +25,6 @@ export function FinancePage() {
   const monthlyExpense = useFinanceStore((s) =>
     s.getMonthlyExpense(currentYear, currentMonth)
   )
-  const removeTransaction = useFinanceStore((s) => s.removeTransaction)
   const recent = transactions.slice(0, 30)
 
   const monthLabel = now.toLocaleDateString('ru-RU', {

@@ -5,8 +5,7 @@ import type { TransactionType } from './types'
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from './constants'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { useFinanceStore } from '@/store/financeStore'
-import { useTelegram } from '@/hooks'
+import { useTelegram, useFinanceActions } from '@/hooks'
 import { cn } from '@/utils'
 
 type Props = {
@@ -20,8 +19,9 @@ const typeLabels: Record<TransactionType, string> = {
 }
 
 export function TransactionForm({ open, onOpenChange }: Props) {
-  const { haptic } = useTelegram()
-  const addTransaction = useFinanceStore((s) => s.addTransaction)
+  const { haptic, webApp } = useTelegram()
+  const telegramUserId = webApp.initDataUnsafe?.user?.id
+  const { addTransaction } = useFinanceActions(telegramUserId)
   const [type, setType] = useState<TransactionType>('expense')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState<string>(EXPENSE_CATEGORIES[0])
@@ -44,7 +44,7 @@ export function TransactionForm({ open, onOpenChange }: Props) {
     if (open) reset()
   }, [open])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     const num = amount.replace(/\s/g, '').replace(',', '.')
     const value = parseFloat(num)
@@ -53,7 +53,7 @@ export function TransactionForm({ open, onOpenChange }: Props) {
       return
     }
     haptic.notification('success')
-    addTransaction({
+    await addTransaction({
       amount: Math.round(value * 100) / 100,
       category,
       type,

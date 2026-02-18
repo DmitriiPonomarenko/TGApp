@@ -7,6 +7,8 @@ const STORAGE_KEY = 'tg-finance-transactions'
 export interface FinanceState {
   transactions: Transaction[]
   addTransaction: (t: Omit<Transaction, 'id' | 'createdAt'>) => void
+  addTransactionFromServer: (t: Transaction) => void
+  setTransactions: (transactions: Transaction[]) => void
   removeTransaction: (id: string) => void
   getBalance: () => number
   getMonthlyIncome: (year: number, month: number) => number
@@ -33,6 +35,16 @@ export const useFinanceStore = create<FinanceState>()(
         set((state) => ({
           transactions: [newT, ...state.transactions],
         }))
+      },
+
+      addTransactionFromServer: (t) => {
+        set((state) => ({
+          transactions: [t, ...state.transactions],
+        }))
+      },
+
+      setTransactions: (transactions) => {
+        set({ transactions })
       },
 
       removeTransaction: (id) => {
