@@ -25,6 +25,11 @@ export function useTelegram() {
   useEffect(() => {
     WebApp.ready()
     WebApp.expand()
+    try {
+      ;(WebApp as unknown as { disableVerticalSwipes?: () => void }).disableVerticalSwipes?.()
+    } catch {
+      // не поддерживается в старых версиях клиента
+    }
     applyTelegramTheme()
     WebApp.onEvent('themeChanged', applyTelegramTheme)
     return () => {

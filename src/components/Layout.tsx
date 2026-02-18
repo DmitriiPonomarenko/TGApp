@@ -17,7 +17,7 @@ export function Layout() {
 
   return (
     <div className="flex min-h-[100dvh] flex-col bg-tg-bg">
-      <main className="flex-1 overflow-auto pb-20">
+      <main className="flex-1 overflow-auto pb-20 overscroll-contain">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
