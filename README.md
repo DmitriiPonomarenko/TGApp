@@ -131,3 +131,32 @@ npm run build
 4. Перезапусти dev-сервер: останови (`Ctrl+C`) и снова выполни `npm run dev`.
 
 Данные привязаны к `telegram_user_id` (из `WebApp.initDataUnsafe.user.id`). В Telegram при открытии Mini App подставляется пользователь, и его транзакции/заметки подтягиваются из Supabase. Без Supabase всё по-прежнему хранится в LocalStorage.
+
+---
+
+## Напоминания (Telegram)
+
+Если у заметки указана дата/время напоминания, приложение отправляет задачу на бэкенд; раз в несколько минут cron вызывает API и шлёт пользователю сообщение в Telegram через Bot API.
+
+### Что уже сделано
+
+- Таблица **`reminders`** в Supabase (добавлена в `supabase/schema.sql` — выполни скрипт, если создавал таблицы раньше; иначе создастся при первом запуске полного скрипта).
+- **POST /api/reminders** — приложение вызывает при сохранении заметки с напоминанием (тело: `telegramUserId`, `noteId`, `reminderAt`, `title`, `content`).
+- **DELETE /api/reminders?noteId=...** — отмена напоминания (удаление заметки или смена даты).
+- **GET /api/cron/send-reminders** — забирает из БД напоминания с `reminder_at <= now`, шлёт их в Telegram и помечает отправленными. Вызывать по расписанию (cron).
+
+### Настройка на Vercel
+
+1. **Environment Variables** в проекте Vercel:
+   - **SUPABASE_URL** — тот же Project URL из Supabase (или уже есть **VITE_SUPABASE_URL**).
+   - **SUPABASE_SERVICE_ROLE_KEY** — в Supabase: **Project Settings** → **API** → ключ **service_role** (secret). Нужен для записи в таблицу `reminders` из API.
+   - **TELEGRAM_BOT_TOKEN** — токен бота от [@BotFather](https://t.me/BotFather) (тот же бот, у которого открывается Mini App). Нужен, чтобы бот отправлял пользователю сообщение.
+   - **CRON_SECRET** — любой длинный случайный пароль (например сгенерированный). Им будет защищён вызов cron.
+
+2. **Запуск cron раз в 5 минут** (бесплатно):
+   - Зайди на [cron-job.org](https://cron-job.org) (или аналог).
+   - Создай задачу: URL = `https://твой-проект.vercel.app/api/cron/send-reminders`, метод GET (или POST).
+   - В заголовках укажи: `Authorization: Bearer твой_CRON_SECRET`.
+   - Расписание: каждые 5 минут (`*/5 * * * *` или выбор «каждые 5 минут»).
+
+После этого напоминания из заметок будут уходить пользователю в Telegram в указанное время (с точностью до интервала cron, например до 5 минут).

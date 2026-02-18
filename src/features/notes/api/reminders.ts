@@ -1,36 +1,43 @@
 /**
- * Заглушка для планирования напоминания.
- * В продакшене бэкенд по этому запросу должен:
- * - сохранить задачу на отправку уведомления в нужное время (cron/очередь),
- * - в указанный момент вызвать Telegram Bot API (sendMessage) и отправить
- *   пользователю сообщение с текстом напоминания.
- *
- * @param noteId — id заметки
- * @param reminderAt — ISO строка даты/времени напоминания
- * @param payload — данные для сообщения (заголовок/текст заметки)
+ * Планирование и отмена напоминаний через бэкенд.
+ * Бэкенд сохраняет в Supabase; cron раз в N минут отправляет уведомления в Telegram.
  */
+
+function getApiBase(): string {
+  if (typeof window === 'undefined') return ''
+  return (import.meta.env.VITE_API_URL as string) || window.location.origin
+}
+
 export async function scheduleReminder(
   noteId: string,
   reminderAt: string,
-  payload: { title: string; content: string }
+  payload: { title: string; content: string },
+  telegramUserId: number
 ): Promise<void> {
-  // TODO: заменить на реальный запрос к бэкенду, например:
-  // await fetch('/api/reminders', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify({ noteId, reminderAt, ...payload }),
-  // })
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[reminders] scheduleReminder', { noteId, reminderAt, payload })
+  const base = getApiBase()
+  const res = await fetch(`${base}/api/reminders`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      telegramUserId,
+      noteId,
+      reminderAt,
+      title: payload.title,
+      content: payload.content,
+    }),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}))
+    console.error('[reminders] scheduleReminder failed', res.status, err)
   }
 }
 
-/**
- * Отмена запланированного напоминания (при удалении или смене даты).
- */
 export async function cancelReminder(noteId: string): Promise<void> {
-  // await fetch(`/api/reminders/${noteId}`, { method: 'DELETE' })
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[reminders] cancelReminder', noteId)
+  const base = getApiBase()
+  const res = await fetch(`${base}/api/reminders?noteId=${encodeURIComponent(noteId)}`, {
+    method: 'DELETE',
+  })
+  if (!res.ok) {
+    console.error('[reminders] cancelReminder failed', res.status)
   }
 }

@@ -65,11 +65,11 @@ export function NoteForm({ open, onOpenChange, editNote }: Props) {
       if (hadReminder && !newReminderAt) {
         await cancelReminder(editNote.id)
       }
-      if (newReminderAt) {
+      if (newReminderAt && userId != null) {
         await scheduleReminder(editNote.id, newReminderAt, {
           title: trimmedTitle,
           content: trimmedContent,
-        })
+        }, userId)
       }
       haptic.notification('success')
     } else {
@@ -81,11 +81,11 @@ export function NoteForm({ open, onOpenChange, editNote }: Props) {
         content: trimmedContent,
         reminderAt: reminderAtIso,
       })
-      if (newNote && reminderAtIso) {
+      if (newNote && reminderAtIso && userId != null) {
         await scheduleReminder(newNote.id, reminderAtIso, {
           title: trimmedTitle,
           content: trimmedContent,
-        })
+        }, userId)
       }
       haptic.notification('success')
     }

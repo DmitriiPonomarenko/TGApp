@@ -31,6 +31,22 @@ create table if not exists public.notes (
 create index if not exists idx_notes_telegram_user_id
   on public.notes (telegram_user_id);
 
+-- Напоминания: хранятся здесь, cron раз в N минут забирает просроченные и шлёт в Telegram
+create table if not exists public.reminders (
+  id uuid primary key default gen_random_uuid(),
+  telegram_user_id bigint not null,
+  note_id text not null,
+  reminder_at timestamptz not null,
+  title text not null default '',
+  content text not null default '',
+  sent_at timestamptz,
+  created_at timestamptz default now()
+);
+
+create index if not exists idx_reminders_reminder_at
+  on public.reminders (reminder_at)
+  where sent_at is null;
+
 -- RLS: включить и настроить под свою авторизацию (опционально).
 -- Сейчас запросы фильтруются по telegram_user_id на клиенте.
 -- Для продакшена рекомендуется включить RLS и проверять пользователя через JWT или Edge Function.
