@@ -37,7 +37,7 @@ export async function fetchTransactions(
     .order('created_at', { ascending: false })
 
   if (error) {
-    console.error('[Supabase] fetchTransactions', error)
+    console.error('[Supabase] fetchTransactions failed:', error.code, error.message)
     return []
   }
   return (data ?? []).map((r) => rowToTransaction(r as Row))
@@ -57,7 +57,7 @@ export async function addTransaction(
     type: t.type,
     date: t.date,
     comment: t.comment ?? null,
-    created_at: Date.now(),
+    created_at: Math.floor(Date.now()), // целое число для bigint в Postgres
   }
 
   const { data, error } = await supabase
@@ -67,7 +67,7 @@ export async function addTransaction(
     .single()
 
   if (error) {
-    console.error('[Supabase] addTransaction', error)
+    console.error('[Supabase] addTransaction failed:', error.code, error.message, error.details)
     return null
   }
   return rowToTransaction({ ...data, telegram_user_id: telegramUserId } as Row)

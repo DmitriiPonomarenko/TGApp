@@ -33,7 +33,7 @@ export async function fetchNotes(telegramUserId: number): Promise<Note[]> {
     .order('updated_at', { ascending: false })
 
   if (error) {
-    console.error('[Supabase] fetchNotes', error)
+    console.error('[Supabase] fetchNotes failed:', error.code, error.message)
     return []
   }
   return (data ?? []).map((r) => rowToNote(r as Row))
@@ -46,7 +46,7 @@ export async function addNote(
   const supabase = getSupabase()
   if (!supabase) return null
 
-  const now = Date.now()
+  const now = Math.floor(Date.now())
   const row = {
     telegram_user_id: telegramUserId,
     title: n.title,
@@ -63,7 +63,7 @@ export async function addNote(
     .single()
 
   if (error) {
-    console.error('[Supabase] addNote', error)
+    console.error('[Supabase] addNote failed:', error.code, error.message, error.details)
     return null
   }
   return rowToNote({ ...data, telegram_user_id: telegramUserId } as Row)
@@ -77,7 +77,7 @@ export async function updateNote(
   const supabase = getSupabase()
   if (!supabase) return false
 
-  const row: Record<string, unknown> = { updated_at: Date.now() }
+  const row: Record<string, unknown> = { updated_at: Math.floor(Date.now()) }
   if (patch.title !== undefined) row.title = patch.title
   if (patch.content !== undefined) row.content = patch.content
   if (patch.reminderAt !== undefined) row.reminder_at = patch.reminderAt ?? null
@@ -89,7 +89,7 @@ export async function updateNote(
     .eq('telegram_user_id', telegramUserId)
 
   if (error) {
-    console.error('[Supabase] updateNote', error)
+    console.error('[Supabase] updateNote failed:', error.code, error.message)
     return false
   }
   return true
@@ -109,7 +109,7 @@ export async function removeNote(
     .eq('telegram_user_id', telegramUserId)
 
   if (error) {
-    console.error('[Supabase] removeNote', error)
+    console.error('[Supabase] removeNote failed:', error.code, error.message)
     return false
   }
   return true

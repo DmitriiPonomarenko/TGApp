@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { Plus } from 'lucide-react'
-import { useTelegram, useNotesActions } from '@/hooks'
+import { useUserId, useNotesActions } from '@/hooks'
 import { useNotesStore } from '@/store/notesStore'
 import { cancelReminder, type Note } from '@/features/notes'
 import { Button } from '@/components/ui/Button'
@@ -11,8 +11,8 @@ import { NoteForm } from '@/features/notes/NoteForm'
 export function NotesPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editingNote, setEditingNote] = useState<Note | null>(null)
-  const telegramUserId = useTelegram().webApp.initDataUnsafe?.user?.id
-  const { removeNote } = useNotesActions(telegramUserId)
+  const userId = useUserId()
+  const { removeNote } = useNotesActions(userId)
   const notes = useNotesStore((s) => s.notes)
 
   const handleDelete = async (note: Note) => {

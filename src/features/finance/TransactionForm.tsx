@@ -5,7 +5,7 @@ import type { TransactionType } from './types'
 import { INCOME_CATEGORIES, EXPENSE_CATEGORIES } from './constants'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
-import { useTelegram, useFinanceActions } from '@/hooks'
+import { useTelegram, useUserId, useFinanceActions } from '@/hooks'
 import { cn } from '@/utils'
 
 type Props = {
@@ -19,9 +19,9 @@ const typeLabels: Record<TransactionType, string> = {
 }
 
 export function TransactionForm({ open, onOpenChange }: Props) {
-  const { haptic, webApp } = useTelegram()
-  const telegramUserId = webApp.initDataUnsafe?.user?.id
-  const { addTransaction } = useFinanceActions(telegramUserId)
+  const { haptic } = useTelegram()
+  const userId = useUserId()
+  const { addTransaction } = useFinanceActions(userId)
   const [type, setType] = useState<TransactionType>('expense')
   const [amount, setAmount] = useState('')
   const [category, setCategory] = useState<string>(EXPENSE_CATEGORIES[0])

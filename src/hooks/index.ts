@@ -1,4 +1,5 @@
 export { useTelegram } from './useTelegram'
+export { useUserId } from './useUserId'
 export { useSupabaseSync } from './useSupabaseSync'
 export { useFinanceActions } from './useFinanceActions'
 export { useNotesActions } from './useNotesActions'

@@ -5,7 +5,7 @@ import type { Note } from './types'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { scheduleReminder, cancelReminder } from './api/reminders'
-import { useTelegram, useNotesActions } from '@/hooks'
+import { useTelegram, useUserId, useNotesActions } from '@/hooks'
 
 type Props = {
   open: boolean
@@ -14,9 +14,9 @@ type Props = {
 }
 
 export function NoteForm({ open, onOpenChange, editNote }: Props) {
-  const { haptic, webApp } = useTelegram()
-  const telegramUserId = webApp.initDataUnsafe?.user?.id
-  const { addNote, updateNote } = useNotesActions(telegramUserId)
+  const { haptic } = useTelegram()
+  const userId = useUserId()
+  const { addNote, updateNote } = useNotesActions(userId)
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [reminderAt, setReminderAt] = useState('')

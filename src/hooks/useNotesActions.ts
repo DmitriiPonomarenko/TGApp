@@ -35,7 +35,7 @@ export function useNotesActions(telegramUserId: number | undefined) {
       patch: Partial<Pick<Note, 'title' | 'content' | 'reminderAt'>>
     ) => {
       if (isSupabaseConfigured() && telegramUserId != null) {
-        const ok = await notesApi.updateNote(telegramUserId, id, patch)
+        await notesApi.updateNote(telegramUserId, id, patch)
         updateLocal(id, patch) // обновляем UI в любом случае; при ошибке API хотя бы локально
       } else {
         updateLocal(id, patch)
@@ -47,7 +47,7 @@ export function useNotesActions(telegramUserId: number | undefined) {
   const removeNote = useCallback(
     async (id: string) => {
       if (isSupabaseConfigured() && telegramUserId != null) {
-        const ok = await notesApi.removeNote(telegramUserId, id)
+        await notesApi.removeNote(telegramUserId, id)
         removeLocal(id) // при ошибке API всё равно убираем из списка
       } else {
         removeLocal(id)
