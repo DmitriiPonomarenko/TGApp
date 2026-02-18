@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Fallback для Telegram theme variables (когда приложение открыто не в Telegram) */
+:root {
+  --tg-theme-bg-color: #1c1c1e;
+  --tg-theme-secondary-bg-color: #2c2c2e;
+  --tg-theme-text-color: #ffffff;
+  --tg-theme-hint-color: #8e8e93;
+  --tg-theme-link-color: #0a84ff;
+  --tg-theme-button-color: #0a84ff;
+  --tg-theme-button-text-color: #ffffff;
+}
+
+@layer base {
+  html {
+    @apply antialiased;
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply min-h-screen bg-[var(--tg-theme-bg-color)] text-[var(--tg-theme-text-color)];
+    padding-bottom: env(safe-area-inset-bottom, 0);
+    -webkit-tap-highlight-color: transparent;
+  }
+}
