@@ -38,8 +38,10 @@
   z-index: 10;
   padding-top: var(--app-header-top);
   margin-top: calc(-1 * var(--app-header-top));
+  margin-bottom: 0;
   background: var(--tg-theme-bg-color);
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.25rem;
+  min-height: auto;
 }
 
 /* В Mini App не закрывать приложение при скролле вниз (overscroll) */
